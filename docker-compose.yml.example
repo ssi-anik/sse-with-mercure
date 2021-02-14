@@ -1,0 +1,77 @@
+version: '3.7'
+
+services:
+    nginx:
+        image: nginx:1.13.6
+        ports:
+            - 80:80
+        volumes:
+            - .:/var/www/html
+            - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+        links:
+            - php
+    
+    php:
+        build:
+            context: .
+            dockerfile: ./docker/php/Dockerfile
+        volumes:
+            - .:/var/www/html
+        links:
+            - redis
+            - postgres
+            - beanstalkd
+            - mercure
+    
+    worker:
+        build:
+            context: .
+            dockerfile: ./docker/php/worker.dockerfile
+        volumes:
+            - .:/var/www/html
+        links:
+            - redis
+            - postgres
+            - beanstalkd
+            - mercure
+    
+    postgres:
+        image: postgres:10.4-alpine
+        ports:
+            - 5432:5432
+        volumes:
+            - ~/.backup/postgres/sse-with-mercure:/var/lib/postgresql/data
+        environment:
+            - POSTGRES_USER=root
+            - POSTGRES_PASSWORD=secret
+            - POSTGRES_DB=sse-with-mercure
+    
+    redis:
+        image: redis:5.0.5
+        ports:
+            - 6379:6379
+        volumes:
+            - ~/.backup/redis/sse-with-mercure:/data
+    
+    beanstalkd:
+        build: ./docker/beanstalkd
+        ports:
+            - 11300:11300
+        volumes:
+            - ~/.backup/beanstalkd/sse-with-mercure:/binlog
+    
+    mercure:
+        image: dunglas/mercure
+        environment:
+            DEBUG: "debug"
+            SERVER_NAME: ':80'
+            # Change the following value if you know how it works.
+            # MERCURE_TRANSPORT_URL: "bolt://mercure.db"
+            MERCURE_PUBLISHER_JWT_KEY: '~my-jwt-key-here~'
+            MERCURE_SUBSCRIBER_JWT_KEY: '~my-jwt-key-here~'
+            # In the cors_origin, add your domain(s). Or just use *
+            MERCURE_EXTRA_DIRECTIVES: |-
+                cors_origins "http://127.0.0.1"
+                anonymous
+        ports:
+            - "9000:80"
