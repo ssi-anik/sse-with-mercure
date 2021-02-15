@@ -16,9 +16,20 @@ use Symfony\Component\Mercure\Update;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    cookie()->queue(
+        'mercureAuthorization',
+        env('MERCURE_SUBSCRIBER_JWT_KEY'),
+        60,
+        '/.well-known/mercure',
+        null,
+        false,
+        false,
+        false,
+        'strict'
+    );
+    return view('main');
 });
 
 Route::get('data', function (Publisher $publisher) {
-    dd($publisher(new Update('http://example.com/books/1', json_encode(['value' => 'is given here']), false, null, 'invoice')));
+    dd($publisher(new Update('http://example.com/books/1', json_encode(['value' => 'is given here']), true)));
 });
