@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Symfony\Component\Mercure\Publisher;
+use Symfony\Component\Mercure\Update;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,4 +17,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
+});
+
+Route::get('data', function (Publisher $publisher) {
+    dd($publisher(new Update('http://example.com/books/1', json_encode(['value' => 'is given here']), false, null, 'invoice')));
 });
