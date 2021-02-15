@@ -9,7 +9,7 @@
 </head>
 
 <body>
-    <div id = "user">
+    <div id = "root">
     </div>
     
     <script src = "{{ asset('js/app.js') }}" defer></script>
