@@ -16,7 +16,7 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->bind(Publisher::class, function () {
-            return (new Publisher('http://mercure/.well-known/mercure', (new StaticJwtProvider(env('MERCURE_JWT_TOKEN')))));
+            return (new Publisher('http://mercure/.well-known/mercure', (new StaticJwtProvider(env('MERCURE_PUBLISHER_JWT_KEY')))));
         });
     }
 
