@@ -8,10 +8,11 @@ use Symfony\Component\Mercure\Update;
 Route::post(
     'broadcast',
     function (Request $request, Publisher $publisher) {
-        $message = $request->get('message', 'empty message is received');
-        $topic = throw_unless($request->get('topic'), new Exception('Topic must be given'));
-        $isPrivate = $request->get('publish_type') === 'private';
-        $publisher(new Update($topic, $message, $isPrivate, null, 'name'));
+        $message = $request->input('message', 'empty message is received');
+        $topic = throw_unless($request->input('topic'), new Exception('Topic must be given'));
+        $isPrivate = $request->input('publish_type') === 'private';
+        $type = $request->input('type');
+        $publisher(new Update($topic, $message, $isPrivate, null, $type));
 
         return response()->json(['error' => false, 'message' => 'Message published.'], 202);
     }

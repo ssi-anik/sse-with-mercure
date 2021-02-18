@@ -7,7 +7,8 @@ window.EventSourceOf = NativeEventSource || EventSourcePolyfill;
 window.EventSourcePolyfill = EventSourcePolyfill;
 
 function App () {
-    const [topicRef, messageRef] = [
+    const [topicRef, messageRef, typeRef] = [
+        useRef(),
         useRef(),
         useRef(),
     ];
@@ -44,7 +45,7 @@ function App () {
         });
     }, []);
 
-    const publishEvent = () => {
+    const publish = () => {
         const topic = topicRef.current.value.trim();
         const message = messageRef.current.value.trim();
         if ( !topic || !message ) {
@@ -53,6 +54,7 @@ function App () {
         }
         const payload = {
             'topic': topicRef.current.value, 'message': messageRef.current.value, 'publish_type': messageType,
+            'type': typeRef.current.value.trim() ?? null
         }
 
         fetch('/api/broadcast', {
@@ -84,13 +86,17 @@ function App () {
                 <div className = "col-12">
                     <p className = "text-info">Publish a message</p>
                     <form className = "form-row" onSubmit = {e => e.preventDefault()}>
-                        <div className = "form-group col-4">
+                        <div className = "form-group col-3">
                             <input type = "text" placeholder = "Topic" ref = {topicRef} name = "topic"
                                    className = "form-control" />
                         </div>
-                        <div className = "form-group col-4">
+                        <div className = "form-group col-3">
                             <input type = "text" placeholder = "Message content" ref = {messageRef}
                                    name = "message" className = "form-control" />
+                        </div>
+                        <div className = "form-group col-2">
+                            <input type = "text" placeholder = "Type" ref = {typeRef}
+                                   name = "type" className = "form-control" />
                         </div>
                         <div className = "form-group col-2">
                             <div className = "form-check form-check-inline">
@@ -98,19 +104,19 @@ function App () {
                                        checked = {messageType == 'public'}
                                        onChange = {() => changeMessageType('public')}
                                        name = "message_type" id = "public" value = "pubic" />
-                                <label className = "form-check-label" htmlFor = "public">Public</label>
+                                <label className = "form-check-label" htmlFor = "public">Pub</label>
                             </div>
                             <div className = "form-check form-check-inline">
                                 <input className = "form-check-input" type = "radio"
                                        checked = {messageType == 'private'}
                                        onChange = {() => changeMessageType('private')}
                                        name = "message_type" id = "private" value = "private" />
-                                <label className = "form-check-label" htmlFor = "private">Private</label>
+                                <label className = "form-check-label" htmlFor = "private">Priv</label>
                             </div>
                         </div>
                         <div className = "form-group col-2">
-                            <button className = "btn btn-block btn-primary" onClick = {() => publishEvent()}
-                                    type = "button">Publish Event
+                            <button className = "btn btn-block btn-primary" onClick = {() => publish()}
+                                    type = "button">Publish
                             </button>
                         </div>
                     </form>
