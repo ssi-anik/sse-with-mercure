@@ -13,7 +13,7 @@ function App () {
         useRef(),
     ];
     const [messages, setMessage] = useState([]);
-    const [messageType, setMessageType] = useState('public');
+    const [privateMessage, setPrivateMessage] = useState(false);
     const [hub, setHub] = useState('');
 
     const addMessage = (message, type = 'info') => {
@@ -53,8 +53,10 @@ function App () {
             return;
         }
         const payload = {
-            'topic': topicRef.current.value, 'message': messageRef.current.value, 'publish_type': messageType,
-            'type': typeRef.current.value.trim() ?? null
+            'topic': topicRef.current.value,
+            'message': messageRef.current.value,
+            'publish_type': privateMessage ? 'private' : 'public',
+            'type': typeRef.current.value.trim() || null
         }
 
         fetch('/api/broadcast', {
@@ -77,7 +79,7 @@ function App () {
     }
 
     const changeMessageType = (value) => {
-        setMessageType(prev => value)
+        setPrivateMessage(() => value)
     }
 
     return (<div className = "container-fluid" style = {{marginTop: 5}}>
@@ -99,19 +101,12 @@ function App () {
                                    name = "type" className = "form-control" />
                         </div>
                         <div className = "form-group col-2">
-                            <div className = "form-check form-check-inline">
-                                <input className = "form-check-input" type = "radio"
-                                       checked = {messageType == 'public'}
-                                       onChange = {() => changeMessageType('public')}
-                                       name = "message_type" id = "public" value = "pubic" />
-                                <label className = "form-check-label" htmlFor = "public">Pub</label>
-                            </div>
-                            <div className = "form-check form-check-inline">
-                                <input className = "form-check-input" type = "radio"
-                                       checked = {messageType == 'private'}
-                                       onChange = {() => changeMessageType('private')}
-                                       name = "message_type" id = "private" value = "private" />
-                                <label className = "form-check-label" htmlFor = "private">Priv</label>
+                            <div className = "custom-control custom-switch" style={{marginTop: 5}}>
+                                <input type = "checkbox" checked = {privateMessage}
+                                       onChange = {() => changeMessageType(!privateMessage)}
+                                       className = "custom-control-input" id = "customSwitch1" />
+                                <label className = "custom-control-label"
+                                       htmlFor = "customSwitch1">Private?</label>
                             </div>
                         </div>
                         <div className = "form-group col-2">
