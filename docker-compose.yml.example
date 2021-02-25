@@ -18,48 +18,8 @@ services:
         volumes:
             - .:/var/www/html
         links:
-            - redis
-            - postgres
-            - beanstalkd
             - mercure
-    
-    worker:
-        build:
-            context: .
-            dockerfile: ./docker/php/worker.dockerfile
-        volumes:
-            - .:/var/www/html
-        links:
-            - redis
-            - postgres
-            - beanstalkd
-            - mercure
-    
-    postgres:
-        image: postgres:10.4-alpine
-        ports:
-            - 5432:5432
-        volumes:
-            - ~/.backup/postgres/sse-with-mercure:/var/lib/postgresql/data
-        environment:
-            - POSTGRES_USER=root
-            - POSTGRES_PASSWORD=secret
-            - POSTGRES_DB=sse-with-mercure
-    
-    redis:
-        image: redis:5.0.5
-        ports:
-            - 6379:6379
-        volumes:
-            - ~/.backup/redis/sse-with-mercure:/data
-    
-    beanstalkd:
-        build: ./docker/beanstalkd
-        ports:
-            - 11300:11300
-        volumes:
-            - ~/.backup/beanstalkd/sse-with-mercure:/binlog
-    
+
     mercure:
         image: dunglas/mercure
         environment:
