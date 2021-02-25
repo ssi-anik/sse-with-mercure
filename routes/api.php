@@ -1,19 +1,14 @@
 <?php
 
+use App\Extensions\Publisher;
 use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Symfony\Component\Mercure\Publisher;
-use Symfony\Component\Mercure\Update;
 
 Route::post(
     'broadcast',
     function (Request $request, Publisher $publisher) {
-        $message = json_encode(['time' => now()->toDateTimeString(), 'message' => $request->input('message', 'empty message is received')]);
-        $topic = throw_unless($request->input('topic'), new Exception('Topic must be given'));
-        $isPrivate = $request->input('publish_type') === 'private';
-        $type = $request->input('type');
-        $publisher(new Update($topic, $message, $isPrivate, null, $type));
+        $publisher->publish($request->all());
 
         return response()->json(['error' => false, 'message' => 'Message published.'], 202);
     }
