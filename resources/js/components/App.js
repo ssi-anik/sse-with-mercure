@@ -8,7 +8,8 @@ window.EventSourceOf = NativeEventSource || EventSourcePolyfill;
 window.EventSourcePolyfill = EventSourcePolyfill;
 
 function App () {
-    const [topicRef, messageRef, typeRef, listenerTopicRef, ttlRef] = [
+    const [topicRef, messageRef, typeRef, listenerTopicRef, ttlRef, listenerTypes] = [
+        useRef(),
         useRef(),
         useRef(),
         useRef(),
@@ -129,9 +130,30 @@ function App () {
         });
     }
 
+    const listenToTypes = () => {
+        let types = listenerTypes.current.value.split(",").map(i => i.trim()).filter(i => i.length > 0);
+        if ( types.length < 1 ) {
+            alert('Invalid type to listen.');
+            return;
+        }
+
+        if ( null === eventStream ) {
+            alert('Connect to stream first.');
+            return;
+        }
+
+        addMessage(`Listening to event types of: ${types.join(",")}`)
+
+        types.forEach(type => {
+            eventStream.addEventListener(type, msg => {
+                messageReceived(msg, type)
+            });
+        });
+    }
+
     const messageReceived = (msg) => {
         setMessage(prev => [
-            {type: 'info', text: `Received message of type: "${msg.type}" - Message: "${msg.data}"`},
+            {type: 'dark', text: `Received message of type: "${msg.type}" - Message: "${msg.data}"`},
             ...prev
         ]);
     }
@@ -206,7 +228,22 @@ function App () {
                         </div>
                     </form>
                 </div>
-                <div className="col-12">
+                <hr />
+                <div className = "col-12">
+                    <p className = "text-info">Listen to event types</p>
+                    <form className = "form-row" onSubmit = {e => e.preventDefault()}>
+                        <div className = "form-group col-9">
+                            <input type = "text" placeholder = "Types (comma separated)"
+                                   ref = {listenerTypes} className = "form-control" />
+                        </div>
+                        <div className = "form-group col-3">
+                            <button className = "btn btn-block btn-info" type = "button"
+                                    onClick = {() => listenToTypes()}>Listen
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div className = "col-12">
                     <List messages = {messages} />
                 </div>
             </div>
