@@ -16,7 +16,8 @@ class Publisher
     }
 
     /**
-     * @param array $data
+     * @param array  $data
+     * @param string $source
      *
      * @throws \Throwable
      */
