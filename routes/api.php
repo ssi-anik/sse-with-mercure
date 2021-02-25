@@ -9,7 +9,7 @@ use Symfony\Component\Mercure\Update;
 Route::post(
     'broadcast',
     function (Request $request, Publisher $publisher) {
-        $message = $request->input('message', 'empty message is received');
+        $message = json_encode(['time' => now()->toDateTimeString(), 'message' => $request->input('message', 'empty message is received')]);
         $topic = throw_unless($request->input('topic'), new Exception('Topic must be given'));
         $isPrivate = $request->input('publish_type') === 'private';
         $type = $request->input('type');
