@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import {EventSourcePolyfill, NativeEventSource} from 'event-source-polyfill';
 import 'bootstrap/dist/css/bootstrap.css';
 import List from "./List";
+import Table from "./Table";
 
 window.EventSourceOf = NativeEventSource || EventSourcePolyfill;
 window.EventSourcePolyfill = EventSourcePolyfill;
@@ -119,7 +120,6 @@ function App () {
             }
             setEventSource(() => {
                 const eventSource = usePolyfill ? new EventSourcePolyfill(url, {headers: {Authorization: 'Bearer ' + token}}) : new EventSource(url, {withCredentials: true});
-                console.log(eventSource);
                 eventSource.onmessage = (msg) => {
                     messageReceived(msg);
                 };
@@ -154,7 +154,7 @@ function App () {
 
     const messageReceived = (msg) => {
         setMessage(prev => [
-            {type: 'dark', text: `Received message of type: "${msg.type}" - Message: "${msg.data}"`},
+            {type: 'dark', text: `Received message of type: "${msg.type}" - Message: "${msg.data}"`, msg},
             ...prev
         ]);
     }
@@ -258,7 +258,7 @@ function App () {
                     </form>
                 </div>
                 <div className = "col-12">
-                    <List messages = {messages} />
+                    <Table messages = {messages} />
                 </div>
             </div>
             <div className = "col-4">
