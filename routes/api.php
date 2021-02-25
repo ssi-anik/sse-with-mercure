@@ -50,12 +50,26 @@ Route::post(
             $payload['exp'] = now()->seconds($ttl)->timestamp;
         }
 
+        $token = JWT::encode($payload, env('MERCURE_SUBSCRIBER_JWT_KEY'));
+
+        $cookie = cookie()->make(
+            'mercureAuthorization',
+            $token,
+            60,
+            '/.well-known/mercure',
+            null,
+            false,
+            false,
+            false,
+            'strict'
+        );
+
         return response()->json(
             [
                 'error'  => false,
                 'topics' => $topics,
-                'token'  => JWT::encode($payload, env('MERCURE_SUBSCRIBER_JWT_KEY')),
+                'token'  => $token,
             ]
-        );
+        )->cookie($cookie);
     }
 );

@@ -17,11 +17,12 @@ function App () {
         useRef(),
     ];
 
-    const [eventStream, setEventStream] = useState(null);
+    const [eventSource, setEventSource] = useState(null);
     const [logs, setLogs] = useState([]);
     const [messages, setMessage] = useState([]);
     const [privateMessage, setPrivateMessage] = useState(false);
     const [anonymous, setAnonymous] = useState(false);
+    const [usePolyfill, setUsePolyfill] = useState(true);
     const [hub, setHub] = useState('');
 
     const addMessage = (message, type = 'info') => {
@@ -112,17 +113,17 @@ function App () {
             const token = response.token;
             const url = new URL(hub);
             response.topics.forEach(topic => url.searchParams.append('topic', topic));
-            const headers = {headers: {Authorization: 'Bearer ' + token}};
-            if ( null !== eventStream ) {
-                addMessage('Disconnecting previous event stream connection', 'danger');
-                eventStream.close();
+            if ( null !== eventSource ) {
+                addMessage('Closing previous event source connection', 'danger');
+                eventSource.close();
             }
-            setEventStream(() => {
-                const eventStream = new EventSourcePolyfill(url, headers)
-                eventStream.onmessage = (msg) => {
+            setEventSource(() => {
+                const eventSource = usePolyfill ? new EventSourcePolyfill(url, {headers: {Authorization: 'Bearer ' + token}}) : new EventSource(url, {withCredentials: true});
+                console.log(eventSource);
+                eventSource.onmessage = (msg) => {
                     messageReceived(msg);
                 };
-                return eventStream;
+                return eventSource;
             })
         }).catch(e => {
             addMessage("Check JS console.", 'warning');
@@ -137,7 +138,7 @@ function App () {
             return;
         }
 
-        if ( null === eventStream ) {
+        if ( null === eventSource ) {
             alert('Connect to stream first.');
             return;
         }
@@ -145,7 +146,7 @@ function App () {
         addMessage(`Listening to event types of: ${types.join(",")}`)
 
         types.forEach(type => {
-            eventStream.addEventListener(type, msg => {
+            eventSource.addEventListener(type, msg => {
                 messageReceived(msg, type)
             });
         });
@@ -164,6 +165,10 @@ function App () {
 
     const changeAnonymity = (value) => {
         setAnonymous(() => value)
+    }
+
+    const changeUsePolyfill = (value) => {
+        setUsePolyfill(() => value)
     }
 
     return (<div className = "container-fluid" style = {{marginTop: 5}}>
@@ -204,8 +209,8 @@ function App () {
                 <div className = "col-12">
                     <p className = "text-info">Subscribe for events</p>
                     <form className = "form-row">
-                        <div className = "form-group col-5">
-                            <input type = "text" placeholder = "Subscribe Topic (comma separated)"
+                        <div className = "form-group col-4">
+                            <input type = "text" placeholder = "Topics (comma separated)"
                                    ref = {listenerTopicRef} className = "form-control" />
                         </div>
                         <div className = "form-group col-2">
@@ -221,7 +226,16 @@ function App () {
                                        htmlFor = "anonymous">Anonymous?</label>
                             </div>
                         </div>
-                        <div className = "form-group col-3">
+                        <div className = "form-group col-2">
+                            <div className = "custom-control custom-switch" style = {{marginTop: 5}}>
+                                <input type = "checkbox" checked = {usePolyfill}
+                                       onChange = {() => changeUsePolyfill(!usePolyfill)}
+                                       className = "custom-control-input" id = "polyfill" />
+                                <label className = "custom-control-label"
+                                       htmlFor = "polyfill">Use polyfill?</label>
+                            </div>
+                        </div>
+                        <div className = "form-group col-2">
                             <button className = "btn btn-block btn-info" type = "button"
                                     onClick = {() => connect()}>Connect
                             </button>

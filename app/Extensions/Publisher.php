@@ -23,17 +23,21 @@ class Publisher
      */
     public function publish(array $data, string $source = 'http')
     {
+        $topic = throw_unless($data['topic'] ?? false, new Exception('Topic must be given'));
+        $isPrivate = ($data['publish_type'] ?? 'private') === 'private';
+        $type = $data['type'] ?? null;
+
         $message = json_encode(
             [
                 'time'    => now()->toDateTimeString(),
                 'source'  => $source,
+                'topic'   => $topic,
+                'type'    => $type,
+                'private' => $isPrivate,
                 'message' => $data['message'] ?? 'empty message is received',
             ]
         );
 
-        $topic = throw_unless($data['topic'] ?? false, new Exception('Topic must be given'));
-        $isPrivate = ($data['publish_type'] ?? 'private') === 'private';
-        $type = $data['type'] ?? null;
-        call_user_func_array($this->mercure, [new Update($topic, $message, $isPrivate, null, $type)]);
+        return call_user_func_array($this->mercure, [new Update($topic, $message, $isPrivate, null, $type)]);
     }
 }
