@@ -19,6 +19,7 @@ class Publisher
      * @param array  $data
      * @param string $source
      *
+     * @return false|mixed
      * @throws \Throwable
      */
     public function publish(array $data, string $source = 'http')
@@ -38,6 +39,7 @@ class Publisher
             ]
         );
 
-        return call_user_func_array($this->mercure, [new Update($topic, $message, $isPrivate, null, $type)]);
+        return ($this->mercure)(new Update($topic, $message, $isPrivate, null, $type));
+        /*return call_user_func_array($this->mercure, [new Update($topic, $message, $isPrivate, null, $type)]);*/
     }
 }
