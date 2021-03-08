@@ -9,24 +9,18 @@ use Symfony\Component\Mercure\Publisher;
 class AppServiceProvider extends ServiceProvider
 {
     /**
-     * Register any application services.
-     *
-     * @return void
-     */
-    public function register()
-    {
-        $this->app->bind(Publisher::class, function () {
-            return (new Publisher('http://mercure/.well-known/mercure', (new StaticJwtProvider(env('MERCURE_PUBLISHER_JWT_KEY')))));
-        });
-    }
-
-    /**
      * Bootstrap any application services.
      *
      * @return void
      */
     public function boot()
     {
-        //
+        $this->app->bind(Publisher::class, function () {
+            $url = 'http://mercure/.well-known/mercure';
+            $token = env('MERCURE_PUBLISHER_JWT_KEY');
+            $jwtProvider = new StaticJwtProvider($token);
+
+            return new Publisher($url, $jwtProvider);
+        });
     }
 }
