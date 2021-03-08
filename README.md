@@ -3,6 +3,9 @@ SSE With Mercure
 
 A Laravel based demo application to subscribe & publish to Mercure.
 
+## Article
+Check the article here at [Medium](https://medium.com/@sirajul.anik/server-sent-events-with-mercure-in-laravel-lumen-14ddc41d3f15)
+
 ## Installation
 
 This project already comes with docker. If you're familiar with docker, then you can just do the following. If you're not familiar with docker, then please run whatever suits you.
