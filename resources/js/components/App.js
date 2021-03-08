@@ -114,6 +114,12 @@ function App () {
             const token = response.token;
             const url = new URL(hub);
             response.topics.forEach(topic => url.searchParams.append('topic', topic));
+
+            const lastEventId = localStorage.getItem('lastEventId')
+            if (lastEventId) {
+                url.searchParams.append('Last-Event-ID', lastEventId);
+            }
+
             if ( null !== eventSource ) {
                 addMessage('Closing previous event source connection', 'danger');
                 eventSource.close();
@@ -153,6 +159,8 @@ function App () {
     }
 
     const messageReceived = (msg) => {
+        console.log(msg);
+        localStorage.setItem('lastEventId', msg.lastEventId);
         setMessage(prev => [
             {type: 'dark', text: `Received message of type: "${msg.type}" - Message: "${msg.data}"`, msg},
             ...prev
