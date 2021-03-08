@@ -15,6 +15,7 @@ This project already comes with docker. If you're familiar with docker, then you
 - `php artisan key:generate` to generate key `APP_KEY`.
 - `composer install` if you have composer installed in your machine.
 - `docker-compose up -d --build`.
+- If you don't have `composer` in your machine, then try installing from the container. `docker-compose exec php composer install`
 
 You're now all good to go.
 
@@ -26,7 +27,7 @@ You're now all good to go.
 
 ## Commands
 
-If you want to publish messages from the command line, use the following available artisan commands.
+If you want to publish messages from the command line, use the following available artisan commands. Just remember that either run these commands from the container or change the Mercure hub URL from the `AppServiceProvider`. 
 
 ```shell
 php artisan publish:message "topic-name" --private
