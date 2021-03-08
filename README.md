@@ -36,3 +36,8 @@ php artisan publish:message "public-topic"
 php artisan publish:message "on-listener-type" --private --type=listener
 php artisan publish:message "public-with-listener-type" --type=listener
 ```
+
+## How bad does it look?
+
+Here is an attached image of the projects. Play with it.
+![](screenshots/screenshot-mercure-publisher-subscriber.png)
